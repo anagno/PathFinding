@@ -28,7 +28,6 @@ import javax.swing.UnsupportedLookAndFeelException;
 public class Gui extends JFrame {
   
   private Map world_;
-  private List<Rectangle> cells_;
   private Point start = new Point(0,0), goal = new Point (4,4);
   
     public static void main(String[] args) {
@@ -60,7 +59,7 @@ public class Gui extends JFrame {
           BorderLayout border_layout = new BorderLayout();
           container.setLayout(border_layout);
                
-          cells_ = new ArrayList<>(5*5);
+          
           world_ = new Map(5,5);
           world_.setObstacle(new Point(3,3), true);
           world_.setObstacle(new Point(2,2), true);
@@ -77,38 +76,53 @@ public class Gui extends JFrame {
           buttonsPanel.setLayout(f);
           container.add(buttonsPanel, BorderLayout.SOUTH);
 
-          JButton add_walls_button;
+          final JButton add_walls_button;
           add_walls_button =  new JButton("Add walls");
-          //add_walls_button.setEnabled(false);
+          
+          final JButton add_start_button;
+          add_start_button =  new JButton("Add goal");
+          
+          final JButton add_goal_button;
+          add_goal_button =  new JButton("Add goal");
+          
+          
+          add_walls_button.setEnabled(false);
           add_walls_button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
               panel.add_wal_ = true ;
               panel.add_goal_ = false ;
               panel.add_start_ = false ;
+              add_walls_button.setEnabled(false);
+              add_start_button.setEnabled(true);
+              add_goal_button.setEnabled(true);
             }
           });
           buttonsPanel.add(add_walls_button);
           
-          JButton add_start_button;
-          add_start_button =  new JButton("Add goal");
+          
           //add_start_button.setEnabled(false);
           add_start_button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
               panel.add_wal_ = false ;
               panel.add_goal_ = false ;
               panel.add_start_ = true ;
+              add_walls_button.setEnabled(true);
+              add_start_button.setEnabled(false);
+              add_goal_button.setEnabled(true);
             }
           });
           buttonsPanel.add(add_start_button);
           
-          JButton add_goal_button;
-          add_goal_button =  new JButton("Add goal");
+          
           //add_goal_button.setEnabled(false);
           add_goal_button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
               panel.add_wal_ = false ;
               panel.add_goal_ = true ;
               panel.add_start_ = false ;
+              add_walls_button.setEnabled(true);
+              add_start_button.setEnabled(true);
+              add_goal_button.setEnabled(false);
             }
           });
           buttonsPanel.add(add_goal_button);
@@ -204,8 +218,6 @@ public class Gui extends JFrame {
             @Override
             public void mouseMoved(MouseEvent e) 
             {
-              Point point = e.getPoint();
-
               int width = getWidth();
               int height = getHeight();
 
@@ -222,8 +234,6 @@ public class Gui extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) 
             {
-              Point point = e.getPoint();
-
               int width = getWidth();
               int height = getHeight();
 
