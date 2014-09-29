@@ -80,7 +80,7 @@ public class Gui extends JFrame {
           add_walls_button =  new JButton("Add walls");
           
           final JButton add_start_button;
-          add_start_button =  new JButton("Add goal");
+          add_start_button =  new JButton("Add start");
           
           final JButton add_goal_button;
           add_goal_button =  new JButton("Add goal");
