@@ -168,7 +168,7 @@ public class Gui extends JFrame {
               AStar astar = new AStar(panel.start_,panel.goal_, world_);
               //System.out.println ("Starting A Star");
               //System.out.println("World:\n " + world_.toString());
-              LinkedList<AStarNode> path = astar.findPath();
+              LinkedList<Node> path = astar.findPath();
               if (path == null)
               {
                 //System.out.println("empty");
@@ -204,7 +204,7 @@ public class Gui extends JFrame {
       private List<Rectangle> cells_ = new ArrayList<Rectangle>();
       private Map world_;
       private Point selected_cell;
-      private LinkedList<AStarNode> path_;
+      private LinkedList<Node> path_;
         
         
       // Variabels for setting the start point and the goal point
@@ -318,7 +318,7 @@ public class Gui extends JFrame {
         super.invalidate();
       }
         
-      protected void drawPath( LinkedList<AStarNode> path )
+      protected void drawPath( LinkedList<Node> path )
       {
         path_ = path;
         repaint();

@@ -4,23 +4,31 @@
 package pathfinding;
 
 import java.awt.Point; //for representing the points
+import java.util.ArrayList;
 
 /**
  * @author anagno
  *
  */
-public class AbstractNode
+public class Node
 {
   
-  public AbstractNode(Point position) 
+  public Node(Point position) 
   {
-    this(position, false);
+    this(position, null);
   }
   
-  public AbstractNode(Point position, boolean is_obstacle)
+  public Node(Point position, ArrayList<Node> edjes)
   {
     setPosition(position);
-    setObstacle(is_obstacle);
+    if( null == edjes )
+    {
+      setAsObstacle();
+    }
+    else
+    {
+      setAsObstacle(edjes);
+    }
   }
   
   /**
@@ -50,9 +58,36 @@ public class AbstractNode
   /**
    * @param is_obstacle_ the is_obstacle_ to set
    */
-  protected void setObstacle(boolean is_obstacle)
+  protected void setAsObstacle(ArrayList<Node> edjes)
   {
-    is_obstacle_ = is_obstacle;
+    setEdjes(null); 
+    is_obstacle_ = false;
+  }
+  
+  /**
+   * @param is_obstacle_ the is_obstacle_ to set
+   */
+  protected void setAsObstacle()
+  {
+    setEdjes(null);    
+    is_obstacle_ = true;
+  }
+  
+  /**
+   * @return the edjes_
+   */
+  public ArrayList<Node> getEdjes()
+  {
+    return edjes_;
+  }
+ 
+  /**
+   * @param edjes_ the edjes_ to set
+   */
+  public void setEdjes(ArrayList<Node> edjes)
+  {
+    edjes_ = edjes;
+    is_obstacle_ = false;
   }
   
   /**
@@ -72,7 +107,7 @@ public class AbstractNode
     {
       return false;
     }
-    AbstractNode other = (AbstractNode) obj;
+    Node other = (Node) obj;
     if ( other.getPosition().x == getPosition().x && other.getPosition().y == getPosition().y ) 
     {
       return true;
@@ -81,10 +116,13 @@ public class AbstractNode
     return false;
   }
   
-  // A private variable showind the location of the node
+  // A private variable showing the location of the node
   private Point position_; 
   
   // A private variable showing if the cell is obstacle
   private boolean is_obstacle_;
+  
+  // A private variable showing the edjes of the current node.
+  private ArrayList<Node> edjes_;
 
 }
