@@ -27,6 +27,10 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 public class Gui extends JFrame {
   
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -6784179367237835435L;
   private Map world_;
   private Point start = new Point(0,0), goal = new Point (4,4);
   
@@ -191,229 +195,236 @@ public class Gui extends JFrame {
     public class GridPanel extends JPanel 
     {
 
-        private int column_count_;
-        private int row_count_;
-        private List<Rectangle> cells_ = new ArrayList<Rectangle>();
-        private Map world_;
-        private Point selected_cell;
-        private LinkedList<AStarNode> path_;
+        /**
+       * 
+       */
+      private static final long serialVersionUID = -4261360122735571252L;
+      private int column_count_;
+      private int row_count_;
+      private List<Rectangle> cells_ = new ArrayList<Rectangle>();
+      private Map world_;
+      private Point selected_cell;
+      private LinkedList<AStarNode> path_;
         
         
-        // Variabels for setting the start point and the goal point
-        public boolean add_wal_ = true;
-        public boolean add_start_ = false;
-        public boolean add_goal_ = false;
-        
-        public Point start_ , goal_ ;
+      // Variabels for setting the start point and the goal point
+      public boolean add_wal_ = true;
+      public boolean add_start_ = false;
+      public boolean add_goal_ = false;
+       
+      public Point start_ , goal_ ;
 
-        public GridPanel(Map world ) 
-        {
-          column_count_= world.getHeight();
-          row_count_=world.getWidth();
-          world_ = world;
+      public GridPanel(Map world ) 
+      {
+        column_count_= world.getHeight();
+        row_count_=world.getWidth();
+        world_ = world;
           
-          MouseAdapter mouseHandler;
-          mouseHandler = new MouseAdapter() 
+        MouseAdapter mouseHandler;
+        mouseHandler = new MouseAdapter() 
+        {
+          @Override
+          public void mouseMoved(MouseEvent e) 
           {
-            @Override
-            public void mouseMoved(MouseEvent e) 
-            {
-              int width = getWidth();
-              int height = getHeight();
+            int width = getWidth();
+            int height = getHeight();
 
-              int cellWidth = width / column_count_;
-              int cellHeight = height / row_count_;
+            int cellWidth = width / column_count_;
+            int cellHeight = height / row_count_;
 
-              int column = e.getX() / cellWidth;
-              int row = e.getY() / cellHeight;
-              selected_cell = new Point(column, row);
-              repaint();
+            int column = e.getX() / cellWidth;
+            int row = e.getY() / cellHeight;
+            selected_cell = new Point(column, row);
+            repaint();
 
-            }
+          }
             
-            @Override
-            public void mouseClicked(MouseEvent e) 
+          @Override
+          public void mouseClicked(MouseEvent e) 
+          {
+            int width = getWidth();
+            int height = getHeight();
+
+            int cellWidth = width / column_count_;
+            int cellHeight = height / row_count_;
+
+            int column = e.getX() / cellWidth;
+            int row = e.getY() / cellHeight;
+
+            selected_cell = new Point(column, row);
+            if (add_wal_)
             {
-              int width = getWidth();
-              int height = getHeight();
-
-              int cellWidth = width / column_count_;
-              int cellHeight = height / row_count_;
-
-              int column = e.getX() / cellWidth;
-              int row = e.getY() / cellHeight;
-
-              selected_cell = new Point(column, row);
-              if (add_wal_)
+              if (!world_.getNode(selected_cell).isObstacle())
               {
-                if (!world_.getNode(selected_cell).isObstacle())
-                {
-                  world_.setObstacle(selected_cell, true);
-                }
-                else
-                {
-                  world_.setObstacle(selected_cell, false);
-                }
+                world_.setObstacle(selected_cell, true);
               }
-              else if (add_start_)
+              else
               {
-                start_ = selected_cell;
+                world_.setObstacle(selected_cell, false);
               }
-              else if (add_goal_)
-              {
-                goal_ = selected_cell;
-              }              
+            }
+            else if (add_start_)
+            {
+              start_ = selected_cell;
+            }
+            else if (add_goal_)
+            {
+              goal_ = selected_cell;
+            }              
               
-              repaint();
+            repaint();
 
-            }
-          };
-          addMouseMotionListener(mouseHandler);
-          addMouseListener(mouseHandler);
-        }
-        
-        
-        public void resetWorld(Map world)
-        {
-          goal_ = null;
-          start_ = null;
-          column_count_= world.getHeight();
-          row_count_=world.getWidth(); 
-          world_ = world;
-          resetWorld();
-        }
-        
-        public void resetWorld()
-        {
-          try
-          {
-            cells_.clear();
-            path_.clear();
           }
-          catch(NullPointerException e)
-          {
-            
-          }
-        }
-
-        @Override
-        public Dimension getPreferredSize() {
-            return new Dimension(200, 200);
-        }
-
-        @Override
-        public void invalidate() {
-            cells_.clear();
-            selected_cell = null;
-            super.invalidate();
-        }
+        };
+        addMouseMotionListener(mouseHandler);
+        addMouseListener(mouseHandler);
+      }
         
-        protected void drawPath( LinkedList<AStarNode> path )
+        
+      public void resetWorld(Map world)
+      {
+        goal_ = null;
+        start_ = null;
+        column_count_= world.getHeight();
+        row_count_=world.getWidth(); 
+        world_ = world;
+        resetWorld();
+      }
+        
+      public void resetWorld()
+      {
+        try
         {
-          path_ = path;
-          repaint();
+          cells_.clear();
+          path_.clear();
         }
-
-        @Override
-        protected void paintComponent(Graphics g) 
+        catch(NullPointerException e)
         {
-          super.paintComponent(g);
-          Graphics2D g2d = (Graphics2D) g.create();
-
-          int width = getWidth();
-          int height = getHeight();
-
-          int cellWidth = width / column_count_;
-          int cellHeight = height / row_count_;
-
-          int xOffset = (width - (column_count_ * cellWidth)) / 2;
-          int yOffset = (height - (row_count_ * cellHeight)) / 2;
-
-          if (cells_.isEmpty()) 
-          {
-            for (int row = 0; row < row_count_; row++) 
-            {
-              for (int col = 0; col < column_count_; col++) 
-              {
-                Rectangle cell = new Rectangle(
-                              xOffset + (col * cellWidth),
-                              yOffset + (row * cellHeight),
-                              cellWidth,
-                              cellHeight);
-                cells_.add(cell);
-                }
-              }
-            }
           
+        }
+      }
+
+      @Override
+      public Dimension getPreferredSize() 
+      {
+        return new Dimension(200, 200);
+      }
+
+      @Override
+      public void invalidate() 
+      {
+        cells_.clear();
+        selected_cell = null;
+        super.invalidate();
+      }
+        
+      protected void drawPath( LinkedList<AStarNode> path )
+      {
+        path_ = path;
+        repaint();
+      }
+
+      @Override
+      protected void paintComponent(Graphics g) 
+      {
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g.create();
+
+        int width = getWidth();
+        int height = getHeight();
+
+        int cellWidth = width / column_count_;
+        int cellHeight = height / row_count_;
+
+        int xOffset = (width - (column_count_ * cellWidth)) / 2;
+        int yOffset = (height - (row_count_ * cellHeight)) / 2;
+
+        if (cells_.isEmpty()) 
+        {
           for (int row = 0; row < row_count_; row++) 
           {
             for (int col = 0; col < column_count_; col++) 
             {
-              Rectangle cell = cells_.get(row * column_count_ + col);
-              if (world_.getNode(new Point(col,row)).isObstacle())
-              {
-                g2d.setColor(Color.GRAY);
-                g2d.fill(cell);  
-              }
-              else
-              {
-                g2d.setColor(Color.WHITE);
-                g2d.fill(cell);
+              Rectangle cell = new Rectangle(
+                            xOffset + (col * cellWidth),
+                            yOffset + (row * cellHeight),
+                            cellWidth,
+                            cellHeight);
+              cells_.add(cell);
               }
             }
           }
-
-          if (selected_cell != null) 
+          
+        for (int row = 0; row < row_count_; row++) 
+        {
+          for (int col = 0; col < column_count_; col++) 
           {
-            try
+            Rectangle cell = cells_.get(row * column_count_ + col);
+            if (world_.getNode(new Point(col,row)).isObstacle())
             {
-              int index = selected_cell.x + (selected_cell.y * column_count_);
-              Rectangle cell = cells_.get(index);
-              g2d.setColor(Color.BLUE);
+              g2d.setColor(Color.GRAY);
+              g2d.fill(cell);  
+            }
+            else
+            {
+              g2d.setColor(Color.WHITE);
               g2d.fill(cell);
             }
-            catch(IndexOutOfBoundsException e)
-            {
-              //do nothing
-            }
           }
-    
-          g2d.setColor(Color.GRAY);
-          for (Rectangle cell : cells_) {
-              g2d.draw(cell);
-          }
-          
-          //draw start point
-          if (start_ != null)
-          {
-            Rectangle cell = cells_.get((int) (start_.getY() * column_count_ + start_.getX()));
-            g2d.setColor(Color.GREEN);
-            g2d.fill(cell);  
-          }
-          //draw goal point
-          
-          if (goal_ != null)
-          {
-            Rectangle cell = cells_.get((int) (goal_.getY() * column_count_ + goal_.getX()));
-            g2d.setColor(Color.RED);
-            g2d.fill(cell);  
-          }
-          
-          // draw path
-          if (path_ != null)
-          {
-            g2d.setColor(Color.BLUE);
-            for (int idx=0, size = path_.size(); idx < size; ++idx)
-            {
-              g2d.fillOval(
-                  path_.get(idx).getPosition().x * cellWidth, 
-                  path_.get(idx).getPosition().y * cellHeight, 
-                  cellWidth, 
-                  cellHeight);
-            }
-          }
-
-          g2d.dispose();
         }
+
+        if (selected_cell != null) 
+        {
+          try
+          {
+            int index = selected_cell.x + (selected_cell.y * column_count_);
+            Rectangle cell = cells_.get(index);
+            g2d.setColor(Color.BLUE);
+            g2d.fill(cell);
+          }
+          catch(IndexOutOfBoundsException e)
+          {
+            //do nothing
+          }
+        }
+    
+        g2d.setColor(Color.GRAY);
+        for (Rectangle cell : cells_) 
+        {
+          g2d.draw(cell);
+        }
+          
+        //draw start point
+        if (start_ != null)
+        {
+          Rectangle cell = cells_.get((int) (start_.getY() * column_count_ + start_.getX()));
+          g2d.setColor(Color.GREEN);
+          g2d.fill(cell);  
+        }
+        //draw goal point
+         
+        if (goal_ != null)
+        {
+          Rectangle cell = cells_.get((int) (goal_.getY() * column_count_ + goal_.getX()));
+          g2d.setColor(Color.RED);
+          g2d.fill(cell);  
+        }
+          
+        // draw path
+        if (path_ != null)
+        {
+          g2d.setColor(Color.BLUE);
+          for (int idx=0, size = path_.size(); idx < size; ++idx)
+          {
+            g2d.fillOval(
+                path_.get(idx).getPosition().x * cellWidth, 
+                path_.get(idx).getPosition().y * cellHeight, 
+                cellWidth, 
+                cellHeight);
+          }
+        }
+
+        g2d.dispose();
+      }
     }
 }
