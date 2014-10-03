@@ -52,7 +52,7 @@ public class AStar
     while(!open_list_.isEmpty())
     {
       current = lookingForBestNode(); // get node with lowest f Costs from open list
-      System.out.println("current node: " + current.toString() + "\n");
+      //System.out.println("current node: " + current.toString() + "\n");
       
       if (current.equals(goal)) // found goal
         return constructPath(current);
@@ -74,7 +74,7 @@ public class AStar
           try
           {
             AStarNode current_adj = map_[left_top_x][left_top_y];
-            System.out.println("Inside ajdacent \n");
+            //System.out.println("Inside ajdacent \n");
             
             if (current_adj.isObstacle() || current_adj.equals(current) || closed_list_.contains(current_adj))
             {
@@ -122,7 +122,7 @@ public class AStar
   
   private double calculateDistance (AStarNode start, AStarNode finish)
   {
-    return Math.sqrt(Math.pow(start.getPosition().x - finish.getPosition().x, 2) 
+    return Math.sqrt(Math.pow(start.getPosition().x - finish.getPosition().x, 2)
         + Math.pow(start.getPosition().y - finish.getPosition().y, 2));
   }
   
@@ -133,7 +133,7 @@ public class AStar
     while ( goal != null)
     {
       path.addFirst(goal.getNode());
-      System.out.println("Inside construct paht: goal: " + goal.toString() + "\n");
+      //System.out.println("Inside construct paht: goal: " + goal.toString() + "\n");
       goal = goal.getParentNode();
     }
     
