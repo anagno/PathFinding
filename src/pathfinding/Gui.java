@@ -164,25 +164,34 @@ public class Gui extends JFrame {
           btnAstar.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-              
-              AStar astar = new AStar(panel.start_,panel.goal_, world_);
-              //System.out.println ("Starting A Star");
-              //System.out.println("World:\n " + world_.toString());
-              LinkedList<Node> path = astar.findPath();
-              if (path == null)
+              if (panel.start_ != null && panel.goal_ !=null)
               {
-                //System.out.println("empty");
-                JOptionPane.showMessageDialog(frame,
-                    "No path was found.",
-                    "Message",
-                    JOptionPane.INFORMATION_MESSAGE);
+                AStar astar = new AStar(panel.start_,panel.goal_, world_);
+                //System.out.println ("Starting A Star");
+                //System.out.println("World:\n " + world_.toString());
+                LinkedList<Node> path = astar.findPath();
+                if (path == null)
+                {
+                  //System.out.println("empty");
+                  JOptionPane.showMessageDialog(frame,
+                      "No path was found.",
+                      "Message",
+                      JOptionPane.INFORMATION_MESSAGE);
+                }
+                else
+                {
+                  panel.drawPath(path);
+                  //System.out.println("Path: " + path.toString());
+                }
               }
               else
               {
-                panel.drawPath(path);
-                //System.out.println("Path: " + path.toString());
+                JOptionPane.showMessageDialog(frame,
+                    "Please place the start and the goal squares.",
+                    "Message",
+                    JOptionPane.INFORMATION_MESSAGE);
               }
-                                   
+              
             }
           });
           buttonsPanel.add(btnAstar);
