@@ -275,10 +275,12 @@ public class Gui extends JFrame {
             else if (add_start_)
             {
               start_ = selected_cell;
+              world_.setObstacle(selected_cell, false);
             }
             else if (add_goal_)
             {
               goal_ = selected_cell;
+              world_.setObstacle(selected_cell, false);
             }              
               
             repaint();

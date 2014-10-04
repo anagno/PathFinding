@@ -70,7 +70,6 @@ public class AStar
           }
         }
       }
-      
            
       for (int idx = 0, size = adjacent_nodes.size(); idx<size; ++idx)
       {
@@ -103,7 +102,6 @@ public class AStar
         + Math.pow(start.getPosition().y - finish.getPosition().y, 2));
   }
   
- 
   private LinkedList<Node> constructPath (AStarNode goal)
   {
     LinkedList<Node> path = new LinkedList<Node>();
