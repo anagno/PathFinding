@@ -32,27 +32,23 @@ public class AStar
   
   public LinkedList<Node> findPath()
   {
-    //System.out.println("Creating open_list and close_list");
+    //Creating open_list and close_list
     open_list_ = new LinkedList<AStarNode>();
     closed_list_ = new LinkedList<AStarNode>();
     
     
-    AStarNode current, start = new AStarNode(start_,false), goal = new AStarNode(goal_,false);
-    
-    //System.out.println("start node: " + start.toString() + "\n");
-    //System.out.println("goal node: " + goal.toString() + "\n");
+    AStarNode current, start = new AStarNode(map_[start_.x][start_.y].getNode()), 
+        goal = new AStarNode(map_[goal_.x][goal_.y].getNode());
     
     start.setGScore(0); // setting  the g score of the start to zero
     
     start.setFScore(calculateDistance(start,goal));
     
     open_list_.add(start); // add starting node to open list
-    //System.out.println("open list in the start: " + open_list_.toString() + "\n");
     
     while(!open_list_.isEmpty())
     {
       current = lookingForBestNode(); // get node with lowest f Costs from open list
-      //System.out.println("current node: " + current.toString() + "\n");
       
       if (current.equals(goal)) // found goal
         return constructPath(current);
@@ -60,37 +56,21 @@ public class AStar
       open_list_.remove(current); // delete current node from open list
       closed_list_.add(current); // add current node to closed list
       
-      //TODO Να δω μήπως και χρησιμοποιήσω την συνάρτηση από την κλάση Map
-      LinkedList<AStarNode> adjacent_nodes= new LinkedList<AStarNode>();
-       
-      int current_x = current.getPosition().x;
-      int current_y = current.getPosition().y;
-      
+      LinkedList<AStarNode> adjacent_nodes = new LinkedList<AStarNode>();
 
-      for (int left_top_y=current_y-1; left_top_y <current_y+2; ++left_top_y)
+      ArrayList<Node> edjes = current.getNode().getEdjes();
+      if(edjes != null)
       {
-        for (int left_top_x=current_x-1; left_top_x <current_x+2; ++left_top_x)
+        for (int idx = 0, size = edjes.size(); idx<size; ++idx)
         {
-          try
+          AStarNode current_edje = map_[edjes.get(idx).getPosition().x][edjes.get(idx).getPosition().y];
+          if(current_edje.isObstacle() || !closed_list_.contains(current_edje))
           {
-            AStarNode current_adj = map_[left_top_x][left_top_y];
-            //System.out.println("Inside ajdacent \n");
-            
-            if (current_adj.isObstacle() || current_adj.equals(current) || closed_list_.contains(current_adj))
-            {
-              continue;
-            }
-            else
-            {
-              adjacent_nodes.add(current_adj);
-            }
-          }
-          catch (ArrayIndexOutOfBoundsException e)
-          {
-           //do nothing 
+            adjacent_nodes.add(current_edje);
           }
         }
       }
+      
            
       for (int idx = 0, size = adjacent_nodes.size(); idx<size; ++idx)
       {
@@ -112,12 +92,9 @@ public class AStar
           }
         }
       }
-      
-      
     }
     
     return null;
-    
   }
   
   private double calculateDistance (AStarNode start, AStarNode finish)
@@ -133,7 +110,6 @@ public class AStar
     while ( goal != null)
     {
       path.addFirst(goal.getNode());
-      //System.out.println("Inside construct paht: goal: " + goal.toString() + "\n");
       goal = goal.getParentNode();
     }
     

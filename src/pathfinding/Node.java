@@ -15,22 +15,43 @@ public class Node
   
   public Node(Point position) 
   {
-    this(position, null);
+    setPosition(position);
+    setAsObstacle();
+
   }
   
   public Node(Point position, ArrayList<Node> edjes)
   {
     setPosition(position);
-    if( null == edjes )
-    {
-      setAsObstacle();
-    }
-    else
-    {
-      setAsObstacle(edjes);
-    }
+    setAsObstacle(edjes);
+  }
+    
+  /**
+   * @return the edjes_
+   */
+  public ArrayList<Node> getEdjes()
+  {
+    return edjes_;
   }
   
+  /**
+   * @param is_obstacle_ the is_obstacle_ to set
+   */
+  protected void setAsObstacle(ArrayList<Node> edjes)
+  {
+    is_obstacle_ = false;
+    edjes_ = edjes;
+  }
+  
+  /**
+   * @param is_obstacle_ the is_obstacle_ to set
+   */
+  protected void setAsObstacle()
+  {
+    is_obstacle_ = true;
+    edjes_ = null;      
+  }
+   
   /**
    * @return the position_
    */
@@ -53,41 +74,6 @@ public class Node
   public boolean isObstacle()
   {
     return is_obstacle_;
-  }
-
-  /**
-   * @param is_obstacle_ the is_obstacle_ to set
-   */
-  protected void setAsObstacle(ArrayList<Node> edjes)
-  {
-    setEdjes(null); 
-    is_obstacle_ = false;
-  }
-  
-  /**
-   * @param is_obstacle_ the is_obstacle_ to set
-   */
-  protected void setAsObstacle()
-  {
-    setEdjes(null);    
-    is_obstacle_ = true;
-  }
-  
-  /**
-   * @return the edjes_
-   */
-  public ArrayList<Node> getEdjes()
-  {
-    return edjes_;
-  }
- 
-  /**
-   * @param edjes_ the edjes_ to set
-   */
-  public void setEdjes(ArrayList<Node> edjes)
-  {
-    edjes_ = edjes;
-    is_obstacle_ = false;
   }
   
   /**
@@ -115,6 +101,14 @@ public class Node
     
     return false;
   }
+  
+  @Override
+  public String toString() 
+  {
+    return "(" + getPosition().x + ", " + getPosition().y + ")";
+  }
+  
+  
   
   // A private variable showing the location of the node
   private Point position_; 
