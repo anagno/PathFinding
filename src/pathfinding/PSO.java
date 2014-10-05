@@ -5,6 +5,8 @@ package pathfinding;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Random;
 
 
 
@@ -15,122 +17,269 @@ import java.util.ArrayList;
 public class PSO
 {
   
-  public PSO(Point start, Point goal, Map map)
+  public PSO(Point start, Point goal, Map map, int population)
   {
-    start_ = start;
-    goal_ = goal;
+    map_ = map;
+    start_ = map_.getNode(start);
+    goal_ = map_.getNode(goal);
+    population_ = population; 
+    particles_ = new Particle[population_];
     //TODO
   }
   
+  public LinkedList<Node> findPath()
+  {
+    calculatePSO();
+    LinkedList<Node> solution = new LinkedList<Node>();
+    solution.addAll(global_best_.getPosition());
+    return solution;
+  }
+
+
+  // Να βρω καλύτερο όνομα. Κατ' ουσία ειναι η κύρια μέθοδος
+  public void calculatePSO()
+  {
+    System.out.println("Initialiaze Population \n");
+    initializePopulation();
+    
+    global_best_ = particles_[0];
+    
+    for (int idx=1; idx<population_; ++idx)
+    {
+      //if (particles_[i].position<pbest)
+      //  particles_[i].pbest = current position
+
+      if (particles_[idx].getFitness() < global_best_.getFitness() )
+      {
+        global_best_ = particles_[idx];
+      }
+      
+      // compute velocity
+      // u_p(t) = u_p(t-1) +c1*rand_1(pbest(t-1) - x(t-1)) +c2*rand_2(gbest(t-1) - x(t-2))
+      //w=inertia factor
+      // update position
+      // x(t) = x(t-1) + u_p(t)
+    }
+  }
+
+  // Function that initializes the population
+  public void initializePopulation()
+  { 
+    SOLUTION:
+    for (int idx = 0; idx <population_; )
+    {
+      ArrayList<Node> possible_solution = new ArrayList<Node>(); 
+      ArrayList<Node> used_nodes = new ArrayList<Node>();
+      
+      possible_solution.add(start_);
+      used_nodes.add(start_);
+      
+      System.out.println("Just before the while");
+      
+      BEGIN_OF_SOLUTION:
+      while(true)
+      {
+        System.out.println("possible_solution: " + possible_solution.toString());
+        Node current_node = possible_solution.get(possible_solution.size() - 1), next_node;
+        
+        //Γιατί άμα την αφαιρέσω απ` ευθείας, επειδή είναι δείκτης φεύγει για πάντα !!!
+        ArrayList<Node> edges = (ArrayList<Node>) current_node.getEdges().clone();
+            
+        System.out.println("current_node: " + current_node.toString() + ",edges size: " + edges.size() );
+        
+        // Άμα δεν υπάρχουν ακμες αφαιρούμε το κόμβο και τον προσθέτουμε στους χρησιμοποιημένους και πάμε
+        // ένα βήμα πίσω.
+        if (edges == null)
+        {
+          used_nodes.add(current_node);
+          possible_solution.remove(possible_solution.size() - 1);
+          break BEGIN_OF_SOLUTION;
+        }
+        
+        // Διαλέγουμε τον επόμενο κόμβο εδώ
+        while(edges.size()>=0)
+        {
+          // Έχουμε χρησιμοποιήσει όλες τις ενναλακτικές και δεν μπορούμε να πάμε κάπου αλλου άρα πάμε πίσω.
+          if (edges.isEmpty() )
+          {
+            System.out.println("Removing element: " + possible_solution.get(possible_solution.size() -1));
+            possible_solution.remove(possible_solution.size() - 1); 
+            break;
+          }
+          //System.out.println("used_ones: " + used_nodes.size() + ", possible_solution: " + possible_solution.size());
+          // Διαλέγουμε έναν κόμβο στην τύχη
+          int rand_number = randInt(0, edges.size()-1);
+          next_node = edges.remove(rand_number);
+          
+          System.out.println("next_node: " + next_node.toString() + ", rand: " + rand_number + ", edges_size: " + edges.size() + ", containded: " + used_nodes.contains(next_node) + ", isObstacle: " + next_node.isObstacle() + ", solution_contain: " + possible_solution.contains(next_node));
+          //System.out.println("current node: " + current_node.toString() +", size: "+ possible_solution.size() + ", rand: "+ rand_number +  " next node: " + next_node.toString() + ", obstacle: " + next_node.isObstacle() + ", edges size: " + edges.size());
+          
+          // Άμα διαλέξουμε κάποιο κόμβο που έχουμε ήδη χρησιμοποιήσει προχωράμε
+          if(next_node.isObstacle() || used_nodes.contains(next_node))
+          {
+            continue;
+          }       
+          // Άμα ο επόμενος κόμβος είναι εμπόδιο τον αφαιρούμε από την λίστα και τον προσθέτουμε στους χρησιμοποιημένους
+          // και συνεχίζουμε με την λούπα.
+
+          
+          //Τον τοποθετούμε στους χρησιμοποιημένους για να μην τον ξαναχρησιμοποιήσουμε
+          used_nodes.add(next_node);
+          
+          // Άμα ο επόμενος κόμβος δεν περιλαμβάνεται στην λύση τον προσθέτουμε και συνεχίζουμε
+          if (!possible_solution.contains(next_node))
+          {
+            
+            System.out.println("Adding: " + next_node.toString());
+            possible_solution.add(next_node);
+            System.out.println("After adding to solution: " + possible_solution.toString());
+            
+            // Άμα είναι ίσος με τον τελικό κόμβο τότε βρήκαμε την λύση
+            if(next_node.equals(goal_))
+            {
+              break BEGIN_OF_SOLUTION;
+            }
+            
+            // Υπάρχουν κύκλοι στην λύση άρα δεν μας κάνει. Κανονικά δεν πρέπει να συμβεί !!!
+            if(possible_solution.size()>= ( (map_.getHeight()*map_.getWidth()) -1) )
+            {
+              break SOLUTION;
+            }
+          }
+          
+          break;     
+        }
+        
+        System.out.println("edges size: " + edges.size() );
+
+        
+          
+      }                   
+      // Άμα έχουμε ως τελευταίο κόμβο την λύση τότε την προσθέτουμε την λύση στα σωματίδια.
+      if (possible_solution.get(possible_solution.size() - 1) == goal_)
+      {
+        particles_[idx] = new Particle(possible_solution);
+        System.out.println("idx: " + idx +" , solution: " + possible_solution.toString());
+        System.out.println("Fitness: " + particles_[idx].getFitness() + "\n");
+        ++idx;
+        used_nodes.clear();
+        
+      }
+      
+    } 
+  } 
+  
+  
+  //http://stackoverflow.com/questions/363681/generating-random-integers-in-a-range-with-java
+  public static int randInt(int min, int max) 
+  {
+    // NOTE: Usually this should be a field rather than a method
+    // variable so that it is not re-seeded every call.
+    Random rand = new Random();
+
+    // nextInt is normally exclusive of the top value,
+    // so add 1 to make it inclusive
+    int random_num = rand.nextInt((max - min) + 1) + min;
+
+    return random_num;
+    }
 
   
   // The variables for representing the goal point and the start point
-  private Point goal_, start_;
+  private Node goal_, start_;
 
   // The population of the PSO
   private int population_;
   
   // The actual populations of particles
-  private Particle particles_;
+  private Particle[] particles_;
   
   // The current gbest
-  private Particle global_best;
+  private Particle global_best_;
+  
+  // The map that is used
+  private final Map map_;
   
   private class Particle
   {
-    public Particle(Position solution)
+    
+    public Particle(ArrayList<Node> solution)
     {
-      position_ = solution;
+      position_ = new Position(solution);
+      personal_best_ = position_;
+      fitness_ = calculateFitness(position_);  
     }
     
-    private double calculateFitness()
+    public ArrayList<Node> getPosition()
     {
-      double fitness=0;
-      
-      
-      return fitness;
+      return position_.getPosition();
     }
-    
-    /**
-     * @return the fitness_
-     */
+      
     public double getFitness()
     {
       return fitness_;
     }
-
-    /**
-     * @param fitness_ the fitness_ to set
-     */
-    public void setFitness()
+    
+    public void updatePosition(ArrayList<Node> position)
     {
-      calculateFitness();
+      position_.update(position);
+      fitness_ = calculateFitness (position_);
+      if( calculateFitness(personal_best_) > fitness_)
+      {
+        personal_best_ = position_;
+      }
     }
     
-    /**
-     * @return the position_
-     */
-    public Position getPosition()
+    private double calculateFitness(Position position)
     {
-      return position_;
+      return (double) position.getPosition().size();
     }
-
-    /**
-     * @param position_ the position_ to set
-     */
-    public void setPosition(Position position)
-    {
-      position_ = position;
-    }
-    
-    private void addVelcocity(Particle particle, Velocity velocity)
-    {
       
-    }
-    
-    private void addVelcocity(Velocity particle, Velocity velocity)
-    {
-      
-    }
-    
     private Position position_;
     //private    velocity_;
     
     // The current pbest
-    private Particle personal_best_;
-    // The current gbest
-    private Particle global_best_;
+    private Position personal_best_;
     
     private double fitness_;
     
     
     private class Position
     {
-    
-      /**
-       * @return the position_
-       */
+      public Position(ArrayList<Node> position)
+      {
+        solution_ = position;
+      }
+      
       public ArrayList<Node> getPosition()
       {
-        return position_;
+        return solution_;
       }
-
-      /**
-       * @param position_ the position_ to set
-       */
-      public void setPosition(ArrayList<Node> position)
+      
+      public void update(ArrayList<Node> new_solution)
       {
-        position_ = position;
+        solution_ = new_solution;
       }
       
-      private ArrayList<Node> position_;
-      
+      private ArrayList<Node> solution_;
     }
     
-    private class Velocity
-    {
+
+    
+    //private class Velocity
+    //{
+      // Θα πρέπει να μπουν μάλλον δύο είδη κινήσεων. 
+      // Το ένα θα είναι ανεξάρτητο και θα λαμβένει υπόψιν μόνο την τωρινή
+      // θέση του σωματιδίου ενώ το άλλο θα λαμβάνει υπόψιν 
+      // και το pbset και το gbest
       
-    }
+      
+
+    //  private Node first_node;
+
+    //  private Node second_node;
+      
+    //}
     
   }
 }

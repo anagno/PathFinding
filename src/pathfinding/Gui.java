@@ -195,6 +195,44 @@ public class Gui extends JFrame {
             }
           });
           buttonsPanel.add(btnAstar);
+          
+          JButton btnPso = new JButton("PSO");
+          btnPso.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+              if (panel.start_ != null && panel.goal_ !=null)
+              {
+                PSO pso = new PSO(panel.start_,panel.goal_, world_, 100);
+                //System.out.println ("Starting A Star");
+                //System.out.println("World:\n " + world_.toString());
+                LinkedList<Node> path = pso.findPath();
+                if (path == null)
+                {
+                  //System.out.println("empty");
+                  JOptionPane.showMessageDialog(frame,
+                      "No path was found.",
+                      "Message",
+                      JOptionPane.INFORMATION_MESSAGE);
+                }
+                else
+                {
+                  panel.drawPath(path);
+                  System.out.println("Path: " + path.toString());
+                }
+              }
+              else
+              {
+                JOptionPane.showMessageDialog(frame,
+                    "Please place the start and the goal squares.",
+                    "Message",
+                    JOptionPane.INFORMATION_MESSAGE);
+              }
+            }
+          });
+          buttonsPanel.add(btnPso);
+          
+          
+          
         
         }
       });
@@ -275,12 +313,10 @@ public class Gui extends JFrame {
             else if (add_start_)
             {
               start_ = selected_cell;
-              world_.setObstacle(selected_cell, false);
             }
             else if (add_goal_)
             {
               goal_ = selected_cell;
-              world_.setObstacle(selected_cell, false);
             }              
               
             repaint();
