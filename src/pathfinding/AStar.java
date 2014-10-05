@@ -58,12 +58,12 @@ public class AStar
       
       LinkedList<AStarNode> adjacent_nodes = new LinkedList<AStarNode>();
 
-      ArrayList<Node> edjes = current.getNode().getEdjes();
-      if(edjes != null)
+      ArrayList<Node> edges = current.getNode().getEdges();
+      if(edges != null)
       {
-        for (int idx = 0, size = edjes.size(); idx<size; ++idx)
+        for (int idx = 0, size = edges.size(); idx<size; ++idx)
         {
-          AStarNode current_edje = map_[edjes.get(idx).getPosition().x][edjes.get(idx).getPosition().y];
+          AStarNode current_edje = map_[edges.get(idx).getPosition().x][edges.get(idx).getPosition().y];
           if(current_edje.isObstacle() || !closed_list_.contains(current_edje))
           {
             adjacent_nodes.add(current_edje);
@@ -204,9 +204,9 @@ public class AStar
     /**
      * @param is_obstacle_ the is_obstacle_ to set
      */
-    protected void setAsObstacle(ArrayList<Node> edjes)
+    protected void setAsObstacle(ArrayList<Node> edges)
     {
-      node_.setAsObstacle(edjes); 
+      node_.setAsObstacle(edges); 
     }
     
     /**

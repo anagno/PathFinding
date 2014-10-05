@@ -20,27 +20,27 @@ public class Node
 
   }
   
-  public Node(Point position, ArrayList<Node> edjes)
+  public Node(Point position, ArrayList<Node> edges)
   {
     setPosition(position);
-    setAsObstacle(edjes);
+    setAsObstacle(edges);
   }
     
   /**
    * @return the edjes_
    */
-  public ArrayList<Node> getEdjes()
+  public ArrayList<Node> getEdges()
   {
-    return edjes_;
+    return edges_;
   }
   
   /**
    * @param is_obstacle_ the is_obstacle_ to set
    */
-  protected void setAsObstacle(ArrayList<Node> edjes)
+  protected void setAsObstacle(ArrayList<Node> edges)
   {
     is_obstacle_ = false;
-    edjes_ = edjes;
+    edges_ = edges;
   }
   
   /**
@@ -49,7 +49,7 @@ public class Node
   protected void setAsObstacle()
   {
     is_obstacle_ = true;
-    edjes_ = null;      
+    edges_ = null;      
   }
    
   /**
@@ -117,6 +117,6 @@ public class Node
   private boolean is_obstacle_;
   
   // A private variable showing the edjes of the current node.
-  private ArrayList<Node> edjes_;
+  private ArrayList<Node> edges_;
 
 }
