@@ -32,7 +32,7 @@ public class Gui extends JFrame {
    */
   private static final long serialVersionUID = -6784179367237835435L;
   private Map world_;
-  private Point start = new Point(0,0), goal = new Point (4,4);
+  private Point start = new Point(0,9), goal = new Point (9,0);
   
     public static void main(String[] args) {
         new Gui();
@@ -64,10 +64,30 @@ public class Gui extends JFrame {
           container.setLayout(border_layout);
                
           
-          world_ = new Map(5,5);
-          world_.setObstacle(new Point(3,3), true);
-          world_.setObstacle(new Point(2,2), true);
-          
+          world_ = new Map(10,10);
+          world_.setObstacle(new Point(0,0), true);
+          world_.setObstacle(new Point(0,3), true);
+          world_.setObstacle(new Point(0,4), true);
+          world_.setObstacle(new Point(1,0), true);
+          world_.setObstacle(new Point(1,3), true);
+          world_.setObstacle(new Point(1,4), true);
+          world_.setObstacle(new Point(2,3), true);
+          world_.setObstacle(new Point(2,4), true);
+          world_.setObstacle(new Point(3,7), true);
+          world_.setObstacle(new Point(3,8), true);
+          world_.setObstacle(new Point(4,7), true);
+          world_.setObstacle(new Point(4,8), true);
+          world_.setObstacle(new Point(4,2), true);
+          world_.setObstacle(new Point(5,8), true);
+          world_.setObstacle(new Point(6,4), true);
+          world_.setObstacle(new Point(7,4), true);
+          world_.setObstacle(new Point(8,4), true);
+          world_.setObstacle(new Point(8,3), true);
+          world_.setObstacle(new Point(9,4), true);
+          world_.setObstacle(new Point(9,3), true);
+          world_.setObstacle(new Point(9,8), true);
+          world_.setObstacle(new Point(9,9), true);
+  
           final GridPanel panel = new GridPanel(world_);
           container.add(panel, BorderLayout.CENTER);
           panel.start_ = start;
