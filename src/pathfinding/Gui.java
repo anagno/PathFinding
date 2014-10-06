@@ -237,7 +237,7 @@ public class Gui extends JFrame {
                 else
                 {
                   panel.drawPath(path);
-                  System.out.println("Path: " + path.toString());
+                  //System.out.println("Path: " + path.toString());
                 }
               }
               else

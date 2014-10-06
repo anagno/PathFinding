@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.Random;
 
 
-
 /**
  * @author anagno
  *
@@ -34,12 +33,12 @@ public class PSO
     solution.addAll(global_best_.getPosition());
     return solution;
   }
-
+  
 
   // Να βρω καλύτερο όνομα. Κατ' ουσία ειναι η κύρια μέθοδος
   public void calculatePSO()
   {
-    System.out.println("Initialiaze Population \n");
+
     initializePopulation();
     
     global_best_ = particles_[0];
@@ -65,7 +64,6 @@ public class PSO
   // Function that initializes the population
   public void initializePopulation()
   { 
-    SOLUTION:
     for (int idx = 0; idx <population_; )
     {
       ArrayList<Node> possible_solution = new ArrayList<Node>(); 
@@ -73,28 +71,28 @@ public class PSO
       
       possible_solution.add(start_);
       used_nodes.add(start_);
-      
-      System.out.println("Just before the while");
-      
+           
       BEGIN_OF_SOLUTION:
       while(true)
       {
-        System.out.println("possible_solution: " + possible_solution.toString());
         Node current_node = possible_solution.get(possible_solution.size() - 1), next_node;
-        
-        //Γιατί άμα την αφαιρέσω απ` ευθείας, επειδή είναι δείκτης φεύγει για πάντα !!!
-        ArrayList<Node> edges = (ArrayList<Node>) current_node.getEdges().clone();
-            
-        System.out.println("current_node: " + current_node.toString() + ",edges size: " + edges.size() );
-        
+               
         // Άμα δεν υπάρχουν ακμες αφαιρούμε το κόμβο και τον προσθέτουμε στους χρησιμοποιημένους και πάμε
-        // ένα βήμα πίσω.
-        if (edges == null)
+        // ένα βήμα πίσω. 
+        // Θεωρητικά δεν πρέπει να χρησιμοποιηθεί ο κώδικας μιας και ελέγχουμε αν ειναι
+        // εμπόδιο στον κώδικα (μόνο αν είναι εμπόδιο ο κόμβος δεν έχει ακμές) -- ΔΕΝ ΙΣΧΥΕΙ !!! 
+        // Αφαίρεσα τον κώδικα που ελέγχει για εμπόδια διότι έδεινε χειρότερες λύσεις ...
+        // ΔΕΝ ΕΧΩ ΙΔΕΑ ΓΙΑ ΠΟΙΟ ΛΟΓΟ !!!
+        if (current_node.getEdges() == null)
         {
           used_nodes.add(current_node);
           possible_solution.remove(possible_solution.size() - 1);
           break BEGIN_OF_SOLUTION;
         }
+        
+        //Γιατί άμα την αφαιρέσω απ` ευθείας, επειδή είναι δείκτης φεύγει για πάντα !!!
+        @SuppressWarnings("unchecked")
+        ArrayList<Node> edges = (ArrayList<Node>) current_node.getEdges().clone();
         
         // Διαλέγουμε τον επόμενο κόμβο εδώ
         while(edges.size()>=0)
@@ -102,27 +100,22 @@ public class PSO
           // Έχουμε χρησιμοποιήσει όλες τις ενναλακτικές και δεν μπορούμε να πάμε κάπου αλλου άρα πάμε πίσω.
           if (edges.isEmpty() )
           {
-            System.out.println("Removing element: " + possible_solution.get(possible_solution.size() -1));
             possible_solution.remove(possible_solution.size() - 1); 
             break;
           }
-          //System.out.println("used_ones: " + used_nodes.size() + ", possible_solution: " + possible_solution.size());
+          
           // Διαλέγουμε έναν κόμβο στην τύχη
           int rand_number = randInt(0, edges.size()-1);
-          next_node = edges.remove(rand_number);
+          next_node = edges.remove(rand_number);    
           
-          System.out.println("next_node: " + next_node.toString() + ", rand: " + rand_number + ", edges_size: " + edges.size() + ", containded: " + used_nodes.contains(next_node) + ", isObstacle: " + next_node.isObstacle() + ", solution_contain: " + possible_solution.contains(next_node));
-          //System.out.println("current node: " + current_node.toString() +", size: "+ possible_solution.size() + ", rand: "+ rand_number +  " next node: " + next_node.toString() + ", obstacle: " + next_node.isObstacle() + ", edges size: " + edges.size());
-          
+          // next_node.isObstacle() ||  . Εναλακτικά θα μπορούσαμε να βάλουμε και αυτό μέσα αλλά για κάποιο λόγο
+          // χωρίς αυτό η λύση είναι καλύτερη. 
           // Άμα διαλέξουμε κάποιο κόμβο που έχουμε ήδη χρησιμοποιήσει προχωράμε
-          if(next_node.isObstacle() || used_nodes.contains(next_node))
+          if( used_nodes.contains(next_node))
           {
             continue;
           }       
-          // Άμα ο επόμενος κόμβος είναι εμπόδιο τον αφαιρούμε από την λίστα και τον προσθέτουμε στους χρησιμοποιημένους
-          // και συνεχίζουμε με την λούπα.
 
-          
           //Τον τοποθετούμε στους χρησιμοποιημένους για να μην τον ξαναχρησιμοποιήσουμε
           used_nodes.add(next_node);
           
@@ -130,9 +123,7 @@ public class PSO
           if (!possible_solution.contains(next_node))
           {
             
-            System.out.println("Adding: " + next_node.toString());
             possible_solution.add(next_node);
-            System.out.println("After adding to solution: " + possible_solution.toString());
             
             // Άμα είναι ίσος με τον τελικό κόμβο τότε βρήκαμε την λύση
             if(next_node.equals(goal_))
@@ -143,24 +134,18 @@ public class PSO
             // Υπάρχουν κύκλοι στην λύση άρα δεν μας κάνει. Κανονικά δεν πρέπει να συμβεί !!!
             if(possible_solution.size()>= ( (map_.getHeight()*map_.getWidth()) -1) )
             {
-              break SOLUTION;
+              break BEGIN_OF_SOLUTION;
             }
           }
           
           break;     
         }
-        
-        System.out.println("edges size: " + edges.size() );
 
-        
-          
       }                   
       // Άμα έχουμε ως τελευταίο κόμβο την λύση τότε την προσθέτουμε την λύση στα σωματίδια.
       if (possible_solution.get(possible_solution.size() - 1) == goal_)
       {
         particles_[idx] = new Particle(possible_solution);
-        System.out.println("idx: " + idx +" , solution: " + possible_solution.toString());
-        System.out.println("Fitness: " + particles_[idx].getFitness() + "\n");
         ++idx;
         used_nodes.clear();
         
