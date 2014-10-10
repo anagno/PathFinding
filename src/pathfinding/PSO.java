@@ -28,18 +28,104 @@ public class PSO
   
   public LinkedList<Node> findPath()
   {
-    calculatePSO();
+    boolean calculated = calculatePSO();
+    if(!calculated)
+      return null;
+    
     LinkedList<Node> solution = new LinkedList<Node>();
     solution.addAll(global_best_.getPosition());
     return solution;
   }
   
+  public ArrayList<Node> findPath(Node start, Node goal)
+  {
+    ArrayList<Node> possible_solution = new ArrayList<Node>(); 
+    ArrayList<Node> used_nodes = new ArrayList<Node>();
+    
+    possible_solution.add(start);
+    used_nodes.add(start);
+         
+    while(!possible_solution.isEmpty())
+    {
+      Node current_node = possible_solution.get(possible_solution.size() - 1), next_node;
+             
+      // Άμα δεν υπάρχουν ακμες αφαιρούμε το κόμβο και τον προσθέτουμε στους χρησιμοποιημένους και πάμε
+      // ένα βήμα πίσω. 
+      // Θεωρητικά δεν πρέπει να χρησιμοποιηθεί ο κώδικας μιας και ελέγχουμε αν ειναι
+      // εμπόδιο στον κώδικα (μόνο αν είναι εμπόδιο ο κόμβος δεν έχει ακμές) -- ΔΕΝ ΙΣΧΥΕΙ !!! 
+      // Αφαίρεσα τον κώδικα που ελέγχει για εμπόδια διότι έδεινε χειρότερες λύσεις ...
+      // ΔΕΝ ΕΧΩ ΙΔΕΑ ΓΙΑ ΠΟΙΟ ΛΟΓΟ !!!
+      if (current_node.getEdges() == null)
+      {
+        used_nodes.add(current_node);
+        possible_solution.remove(possible_solution.size() - 1);
+        continue;
+      }
+      
+      //Γιατί άμα την αφαιρέσω απ` ευθείας, επειδή είναι δείκτης φεύγει για πάντα !!!
+      @SuppressWarnings("unchecked")
+      ArrayList<Node> edges = (ArrayList<Node>) current_node.getEdges().clone();
+      
+      // Διαλέγουμε τον επόμενο κόμβο εδώ
+      while(edges.size()>=0)
+      {
+        // Έχουμε χρησιμοποιήσει όλες τις ενναλακτικές και δεν μπορούμε να πάμε κάπου αλλου άρα πάμε πίσω.
+        if (edges.isEmpty() )
+        {
+          possible_solution.remove(possible_solution.size() - 1); 
+          break ;
+        }
+        
+        // Διαλέγουμε έναν κόμβο στην τύχη
+        int rand_number = randInt(0, edges.size()-1);
+        next_node = edges.remove(rand_number);    
+        
+        // next_node.isObstacle() ||  . Εναλακτικά θα μπορούσαμε να βάλουμε και αυτό μέσα αλλά για κάποιο λόγο
+        // χωρίς αυτό η λύση είναι καλύτερη. 
+        // Άμα διαλέξουμε κάποιο κόμβο που έχουμε ήδη χρησιμοποιήσει προχωράμε
+        if( used_nodes.contains(next_node))
+        {
+          continue;
+        }       
+
+        //Τον τοποθετούμε στους χρησιμοποιημένους για να μην τον ξαναχρησιμοποιήσουμε
+        used_nodes.add(next_node);
+        
+        // Άμα ο επόμενος κόμβος δεν περιλαμβάνεται στην λύση τον προσθέτουμε και συνεχίζουμε
+        if (!possible_solution.contains(next_node))
+        {
+          
+          possible_solution.add(next_node);
+          
+          // Άμα είναι ίσος με τον τελικό κόμβο τότε βρήκαμε την λύση
+          if(next_node.equals(goal))
+          {
+            return possible_solution;
+          }
+          
+          // Υπάρχουν κύκλοι στην λύση άρα δεν μας κάνει. Κανονικά δεν πρέπει να συμβεί !!!
+          if(possible_solution.size()>= ( (map_.getHeight()*map_.getWidth()) -1) )
+          {
+            return null;
+          }
+        }
+        
+        break;     
+      }
+
+    }
+    return null;
+  }
+  
 
   // Να βρω καλύτερο όνομα. Κατ' ουσία ειναι η κύρια μέθοδος
-  public void calculatePSO()
+  public boolean calculatePSO()
   {
 
-    initializePopulation();
+    boolean initialized = initializePopulation();
+    
+    if(!initialized)
+      return false;
     
     global_best_ = particles_[0];
     
@@ -59,99 +145,23 @@ public class PSO
       // update position
       // x(t) = x(t-1) + u_p(t)
     }
+    
+    return true;
   }
 
   // Function that initializes the population
-  public void initializePopulation()
+  public boolean initializePopulation()
   { 
-    for (int idx = 0; idx <population_; )
+    for (int idx = 0; idx <population_;++idx )
     {
-      ArrayList<Node> possible_solution = new ArrayList<Node>(); 
-      ArrayList<Node> used_nodes = new ArrayList<Node>();
+      ArrayList<Node> path = findPath(start_,goal_);
+      if (path == null)
+        return false;
       
-      possible_solution.add(start_);
-      used_nodes.add(start_);
-           
-      BEGIN_OF_SOLUTION:
-      while(true)
-      {
-        Node current_node = possible_solution.get(possible_solution.size() - 1), next_node;
-               
-        // Άμα δεν υπάρχουν ακμες αφαιρούμε το κόμβο και τον προσθέτουμε στους χρησιμοποιημένους και πάμε
-        // ένα βήμα πίσω. 
-        // Θεωρητικά δεν πρέπει να χρησιμοποιηθεί ο κώδικας μιας και ελέγχουμε αν ειναι
-        // εμπόδιο στον κώδικα (μόνο αν είναι εμπόδιο ο κόμβος δεν έχει ακμές) -- ΔΕΝ ΙΣΧΥΕΙ !!! 
-        // Αφαίρεσα τον κώδικα που ελέγχει για εμπόδια διότι έδεινε χειρότερες λύσεις ...
-        // ΔΕΝ ΕΧΩ ΙΔΕΑ ΓΙΑ ΠΟΙΟ ΛΟΓΟ !!!
-        if (current_node.getEdges() == null)
-        {
-          used_nodes.add(current_node);
-          possible_solution.remove(possible_solution.size() - 1);
-          break BEGIN_OF_SOLUTION;
-        }
-        
-        //Γιατί άμα την αφαιρέσω απ` ευθείας, επειδή είναι δείκτης φεύγει για πάντα !!!
-        @SuppressWarnings("unchecked")
-        ArrayList<Node> edges = (ArrayList<Node>) current_node.getEdges().clone();
-        
-        // Διαλέγουμε τον επόμενο κόμβο εδώ
-        while(edges.size()>=0)
-        {
-          // Έχουμε χρησιμοποιήσει όλες τις ενναλακτικές και δεν μπορούμε να πάμε κάπου αλλου άρα πάμε πίσω.
-          if (edges.isEmpty() )
-          {
-            possible_solution.remove(possible_solution.size() - 1); 
-            break;
-          }
-          
-          // Διαλέγουμε έναν κόμβο στην τύχη
-          int rand_number = randInt(0, edges.size()-1);
-          next_node = edges.remove(rand_number);    
-          
-          // next_node.isObstacle() ||  . Εναλακτικά θα μπορούσαμε να βάλουμε και αυτό μέσα αλλά για κάποιο λόγο
-          // χωρίς αυτό η λύση είναι καλύτερη. 
-          // Άμα διαλέξουμε κάποιο κόμβο που έχουμε ήδη χρησιμοποιήσει προχωράμε
-          if( used_nodes.contains(next_node))
-          {
-            continue;
-          }       
-
-          //Τον τοποθετούμε στους χρησιμοποιημένους για να μην τον ξαναχρησιμοποιήσουμε
-          used_nodes.add(next_node);
-          
-          // Άμα ο επόμενος κόμβος δεν περιλαμβάνεται στην λύση τον προσθέτουμε και συνεχίζουμε
-          if (!possible_solution.contains(next_node))
-          {
-            
-            possible_solution.add(next_node);
-            
-            // Άμα είναι ίσος με τον τελικό κόμβο τότε βρήκαμε την λύση
-            if(next_node.equals(goal_))
-            {
-              break BEGIN_OF_SOLUTION;
-            }
-            
-            // Υπάρχουν κύκλοι στην λύση άρα δεν μας κάνει. Κανονικά δεν πρέπει να συμβεί !!!
-            if(possible_solution.size()>= ( (map_.getHeight()*map_.getWidth()) -1) )
-            {
-              break BEGIN_OF_SOLUTION;
-            }
-          }
-          
-          break;     
-        }
-
-      }                   
-      // Άμα έχουμε ως τελευταίο κόμβο την λύση τότε την προσθέτουμε την λύση στα σωματίδια.
-      if (possible_solution.get(possible_solution.size() - 1) == goal_)
-      {
-        particles_[idx] = new Particle(possible_solution);
-        ++idx;
-        used_nodes.clear();
-        
-      }
+      particles_[idx] = new Particle(path);
       
-    } 
+    }
+    return true;
   } 
   
   
