@@ -168,7 +168,10 @@ public class Gui extends JFrame {
                 }
                 else
                 {
-                  //TODO Να μπει μνμ προειδοποίησης
+                  JOptionPane.showMessageDialog(frame,
+                      "Both numbers should be possitive.",
+                      "Message",
+                      JOptionPane.INFORMATION_MESSAGE);
                 }
               }
               catch(NumberFormatException e_num)
@@ -222,23 +225,43 @@ public class Gui extends JFrame {
             public void mouseClicked(MouseEvent e) {
               if (panel.start_ != null && panel.goal_ !=null)
               {
-                PSO pso = new PSO(panel.start_,panel.goal_, world_, 100);
-                //System.out.println ("Starting A Star");
-                //System.out.println("World:\n " + world_.toString());
-                LinkedList<Node> path = pso.findPath();
-                if (path == null)
+                try
                 {
-                  //System.out.println("empty");
-                  JOptionPane.showMessageDialog(frame,
-                      "No path was found.",
-                      "Message",
-                      JOptionPane.INFORMATION_MESSAGE);
+                  int population = Integer.valueOf(JOptionPane.showInputDialog("What is the initial population?"));
+                  if (population>0)
+                  {
+                    PSO pso = new PSO(panel.start_,panel.goal_, world_, population);
+                    //System.out.println ("Starting A Star");
+                    //System.out.println("World:\n " + world_.toString());
+                    LinkedList<Node> path = pso.findPath();
+                    if (path == null)
+                    {
+                      //System.out.println("empty");
+                      JOptionPane.showMessageDialog(frame,
+                          "No path was found.",
+                          "Message",
+                          JOptionPane.INFORMATION_MESSAGE);
+                    }
+                    else
+                    {
+                      panel.drawPath(path);
+                      //System.out.println("Path: " + path.toString());
+                    }
+                  }
+                  else
+                  {
+                    JOptionPane.showMessageDialog(frame,
+                        "The population should be positive.",
+                        "Message",
+                        JOptionPane.INFORMATION_MESSAGE);
+                  }
+                  
                 }
-                else
+                catch(NumberFormatException e_num)
                 {
-                  panel.drawPath(path);
-                  //System.out.println("Path: " + path.toString());
+                  
                 }
+                
               }
               else
               {
