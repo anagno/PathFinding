@@ -5,6 +5,7 @@ package pathfinding;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -152,7 +153,8 @@ public class PSO
   // Function that initializes the population
   public boolean initializePopulation()
   { 
-    for (int idx = 0; idx <population_;++idx )
+    // Αναζητούμε την λύση ξεκινώντας από την αρχή για τον μισό πληθυσμό.
+    for (int idx = 0; idx <population_/2;++idx )
     {
       ArrayList<Node> path = findPath(start_,goal_);
       if (path == null)
@@ -161,6 +163,21 @@ public class PSO
       particles_[idx] = new Particle(path);
       
     }
+    
+    // Αναζητούμε την λύση ξεκινώντας από το τέλος για τον άλλο μισό πληθυσμό.
+    // Αυτό το κάνω με το σκεπτικό πως με αυτό τον τρόπο θα εξερευνήται καλύτερα ο χώρος
+    // των πιθανών λύσεων.
+    for (int idx = (population_/2); idx < population_; ++idx)
+    {
+      ArrayList<Node> path = findPath(start_,goal_);
+      if (path == null)
+        return false;
+      
+      Collections.reverse(path);
+      particles_[idx] = new Particle (path);
+      
+    }
+    
     return true;
   } 
   
