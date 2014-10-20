@@ -51,6 +51,7 @@ public class Gui extends JFrame {
           }
           catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) 
           {
+            //do nothing
           }
         
           final JFrame frame = new JFrame("Grid World Pathfinding");
@@ -111,8 +112,10 @@ public class Gui extends JFrame {
           
           
           add_walls_button.setEnabled(false);
-          add_walls_button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+          add_walls_button.addActionListener(new ActionListener() 
+          {
+            public void actionPerformed(ActionEvent e) 
+            {
               panel.add_wal_ = true ;
               panel.add_goal_ = false ;
               panel.add_start_ = false ;
@@ -125,8 +128,10 @@ public class Gui extends JFrame {
           
           
           //add_start_button.setEnabled(false);
-          add_start_button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+          add_start_button.addActionListener(new ActionListener() 
+          {
+            public void actionPerformed(ActionEvent e) 
+            {
               panel.add_wal_ = false ;
               panel.add_goal_ = false ;
               panel.add_start_ = true ;
@@ -139,8 +144,10 @@ public class Gui extends JFrame {
           
           
           //add_goal_button.setEnabled(false);
-          add_goal_button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+          add_goal_button.addActionListener(new ActionListener() 
+          {
+            public void actionPerformed(ActionEvent e) 
+            {
               panel.add_wal_ = false ;
               panel.add_goal_ = true ;
               panel.add_start_ = false ;
@@ -152,7 +159,8 @@ public class Gui extends JFrame {
           buttonsPanel.add(add_goal_button);
           
           JButton btnResetWorld = new JButton("Reset World");
-          btnResetWorld.addMouseListener(new MouseAdapter() {
+          btnResetWorld.addMouseListener(new MouseAdapter() 
+          {
             @Override
             public void mouseClicked(MouseEvent e) 
             {
@@ -184,9 +192,11 @@ public class Gui extends JFrame {
           buttonsPanel.add(btnResetWorld);
           
           JButton btnAstar = new JButton("ASTAR");
-          btnAstar.addMouseListener(new MouseAdapter() {
+          btnAstar.addMouseListener(new MouseAdapter() 
+          {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mouseClicked(MouseEvent e) 
+            {
               if (panel.start_ != null && panel.goal_ !=null)
               {
                 AStar astar = new AStar(panel.start_,panel.goal_, world_);
@@ -220,9 +230,11 @@ public class Gui extends JFrame {
           buttonsPanel.add(btnAstar);
           
           JButton btnPso = new JButton("PSO");
-          btnPso.addMouseListener(new MouseAdapter() {
+          btnPso.addMouseListener(new MouseAdapter() 
+          {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mouseClicked(MouseEvent e) 
+            {
               if (panel.start_ != null && panel.goal_ !=null)
               {
                 try
@@ -356,10 +368,12 @@ public class Gui extends JFrame {
             else if (add_start_)
             {
               start_ = selected_cell;
+              world_.setObstacle(selected_cell, false);
             }
             else if (add_goal_)
             {
               goal_ = selected_cell;
+              world_.setObstacle(selected_cell, false);
             }              
               
             repaint();
