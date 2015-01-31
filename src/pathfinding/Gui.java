@@ -191,6 +191,44 @@ public class Gui extends JFrame {
           });
           buttonsPanel.add(btnResetWorld);
           
+          JButton btnDikstra = new JButton("DIJKSTRA");
+          btnDikstra.addMouseListener(new MouseAdapter() 
+          {
+            @Override
+            public void mouseClicked(MouseEvent e) 
+            {
+              if (panel.start_ != null && panel.goal_ !=null)
+              {
+            	Dijkstra dikstra = new Dijkstra(panel.start_,panel.goal_, world_);
+                //System.out.println ("Starting A Star");
+                //System.out.println("World:\n " + world_.toString());
+                LinkedList<Node> path = dikstra.findPath();
+                if (path == null)
+                {
+                  //System.out.println("empty");
+                  JOptionPane.showMessageDialog(frame,
+                      "No path was found.",
+                      "Message",
+                      JOptionPane.INFORMATION_MESSAGE);
+                }
+                else
+                {
+                  panel.drawPath(path);
+                  //System.out.println("Path: " + path.toString());
+                }
+              }
+              else
+              {
+                JOptionPane.showMessageDialog(frame,
+                    "Please place the start and the goal squares.",
+                    "Message",
+                    JOptionPane.INFORMATION_MESSAGE);
+              }
+              
+            }
+          });
+          buttonsPanel.add(btnDikstra);
+          
           JButton btnAstar = new JButton("ASTAR");
           btnAstar.addMouseListener(new MouseAdapter() 
           {
